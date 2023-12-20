@@ -9,13 +9,40 @@ class OrderManagePage extends GetView<OrderManageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            )),
+        title: const Text(
+          'Quản lý đơn hàng',
+          style: TextStyle(
+            fontSize: 16.0,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ListView.separated(
-            itemBuilder: (context, index) => ItemOrder(order: controller.orders[index]),
-            separatorBuilder: (context, index) => const Divider(),
-            itemCount: controller.orders.length,
-          )
+          Obx(() => controller.orders.isNotEmpty
+              ? Expanded(
+                  child: ListView.separated(
+                    itemBuilder: (context, index) =>
+                        ItemOrder(order: controller.orders[index]),
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemCount: controller.orders.length,
+                  ),
+                )
+              : const Center(child: CircularProgressIndicator())),
         ],
       ),
     );

@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/order.dart';
 import '../../models/product_detail.dart';
+import '../../models/user_infor.dart';
 
 class FirebaseService {
   static final _auth = FirebaseAuth.instance;
@@ -111,19 +112,32 @@ class FirebaseService {
   }
 
   //Order Manage
-  static Future<List<Order>> fetchOrders() async {
+  static Future<void> fetchOrders(Function(List<Order>) onComplete) async {
     List<Order> orders = [];
-    DataSnapshot snapshot = await _dbRef.child('Orders').get();
-    for (DataSnapshot dataSnapshot in snapshot.children) {
-      final data =
-          jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
-      Order order = Order.fromJson(data);
-      orders.add(order);
-    }
-    return orders;
+    _dbRef.child('Orders').get().then((snapshot) {
+      for (DataSnapshot dataSnapshot in snapshot.children) {
+        final data =
+            jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
+        Order order = Order.fromJson(data);
+        orders.add(order);
+        onComplete(orders);
+      }
+    });
   }
 
-  static void getProductById(String id) {
+  static void getProductById(
+      String id, Function(Product) onComplete, Function(String) onError) {
+    _dbRef.child('Products').child(id).get().then((snapshot) {
+      final data =
+          jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
+      Product product = Product.fromJson(data);
+      onComplete(product);
+    }).onError((error, stackTrace) => onError(error.toString()));
+  }
+  
+  static void getUserInfo(String id, Function(UserInfor) onComplete, Function(String) onError) {
+    _dbRef.child('Users').child(id).get().then((value) {
 
+    });
   }
 }

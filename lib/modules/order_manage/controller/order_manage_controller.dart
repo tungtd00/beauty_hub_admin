@@ -3,7 +3,6 @@ import 'package:beauty_hub_admin/shared/services/firebase_service.dart';
 import 'package:get/get.dart';
 
 class OrderManageController extends GetxController {
-
   RxList<Order> orders = RxList<Order>();
 
   @override
@@ -12,7 +11,15 @@ class OrderManageController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onReady() {
+    getOrders();
+    super.onReady();
+  }
+
   Future<void> getOrders() async {
-    orders.value = await FirebaseService.fetchOrders();
+    FirebaseService.fetchOrders((dataList) {
+      orders.value = dataList;
+    });
   }
 }

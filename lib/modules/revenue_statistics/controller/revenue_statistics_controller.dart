@@ -15,15 +15,15 @@ class RevenueStatisticsController extends GetxController {
   }
 
   Future<void> getRevenueStore() async {
-    orderList.value = await FirebaseService.fetchOrders();
-    orderList.value =
-        orderList.where((item) => item.status == 'SUCCESS').toList();
-    List<OrderItem> orderItems = [];
-    for (var element in orderList) {
-      orderItems.addAll(element.orderItems);
-    }
-    for (var e in orderItems) {
-      revenueStore.value = revenueStore.value + e.pricePerItem * e.quantity;
-    }
+    // orderList.value = await FirebaseService.fetchOrders();
+    // orderList.value =
+    //     orderList.where((item) => item.status == 'SUCCESS').toList();
+    // List<OrderItem> orderItems = [];
+    // for (var element in orderList) {
+    //   orderItems.addAll(element.orderItems);
+    // }
+    // for (var e in orderItems) {
+    //   revenueStore.value = revenueStore.value + e.pricePerItem * e.quantity;
+    // }
   }
 }

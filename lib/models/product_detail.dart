@@ -46,7 +46,7 @@ class ProductDetail {
 
   Map<String, dynamic> toJson() => _$ProductDetailToJson(this);
 
-   Map<String, dynamic> convertToJson() {
+  Map<String, dynamic> convertToJson() {
     return {
       "idProduct": idProduct,
       "name": name,
