@@ -54,9 +54,15 @@ class ProductDetail {
       "description": description,
       "cost": cost,
       "discount": discount,
+      "introduce": introduce,
       "brand": brand.toJson(),
       "categories": categories.map((e) => e.toJson()).toList(),
       "sold": sold,
+      "uses": uses,
+      "howToUse": howToUse,
+      "ingredients": ingredients,
+      "tags": tags,
+      "origin": origin,
     };
   }
 

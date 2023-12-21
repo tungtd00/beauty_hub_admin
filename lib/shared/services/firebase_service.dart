@@ -60,20 +60,24 @@ class FirebaseService {
   }
 
   //Product Manage
-  static Future<List<Product>> fetchProducts() async {
+  static Future<void> fetchProducts(
+    Function(List<Product>) onComplete,
+    Function(String) onError,
+  ) async {
     List<Product> products = [];
     final prefs = Get.find<SharedPreferences>();
     String idUser = prefs.getString(AppConstants.idUser) ?? '';
-    DataSnapshot snapshot = await _dbRef.child('Products').get();
-    for (DataSnapshot dataSnapshot in snapshot.children) {
-      final data =
-          jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
-      Product product = Product.fromJson(data);
-      if (product.brand.idBrand == idUser) {
-        products.add(product);
+    _dbRef.child('Products').get().then((snapshot) {
+      for (DataSnapshot dataSnapshot in snapshot.children) {
+        final data =
+            jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
+        Product product = Product.fromJson(data);
+        if (product.brand.idBrand == idUser) {
+          products.add(product);
+        }
       }
-    }
-    return products;
+      onComplete(products);
+    }).onError((error, stackTrace) => onError(error.toString()));
   }
 
   static void deleteProduct(String idProduct) async {
@@ -141,13 +145,13 @@ class FirebaseService {
       String id, Function(ProductDetail) onComplete, Function(String) onError) {
     _dbRef.child('DetailProducts').child(id).get().then((snapshot) {
       final data =
-      jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
+          jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
       ProductDetail detail = ProductDetail.fromJson(data);
       onComplete(detail);
     }).onError((error, stackTrace) => onError(error.toString()));
   }
 
-  static void getUserInfo(String id, Function(models.UserInfo) onComplete,
+  static void fetchUserInfo(String id, Function(models.UserInfo) onComplete,
       Function(String) onError) {
     _dbRef.child('Users').child(id).get().then((snapshot) {
       final data =

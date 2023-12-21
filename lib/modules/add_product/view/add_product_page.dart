@@ -1,5 +1,7 @@
+import 'dart:developer';
+
 import 'package:beauty_hub_admin/modules/add_product/controller/add_product_controller.dart';
-import 'package:beauty_hub_admin/modules/order_manage/view/product_category_list.dart';
+import 'package:beauty_hub_admin/modules/add_product/view/product_category_list.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,6 +52,9 @@ class AddProductPage extends GetView<AddProductController> {
               const SizedBox(height: 8.0),
               TextFormField(
                 controller: controller.nameController,
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Nhập tên sản phẩm',
                   border: OutlineInputBorder(),
@@ -78,6 +83,9 @@ class AddProductPage extends GetView<AddProductController> {
               TextFormField(
                 controller: controller.priceController,
                 keyboardType: TextInputType.number,
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Nhập giá sản phẩm',
                   border: OutlineInputBorder(),
@@ -131,23 +139,14 @@ class AddProductPage extends GetView<AddProductController> {
                         ),
                       ))),
               const SizedBox(height: 12.0),
-              RichText(
-                  text: const TextSpan(
-                      text: 'Giới thiệu về sản phẩm ',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      children: [
-                    TextSpan(
-                        text: '*',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ))
-                  ])),
+              const Text(
+                'Giới thiệu về sản phẩm',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 8.0),
               TextFormField(
                 controller: controller.introController,
@@ -165,18 +164,30 @@ class AddProductPage extends GetView<AddProductController> {
                 ),
               ),
               const SizedBox(height: 12.0),
-              const Text(
-                'Mô tả',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              RichText(
+                  text: const TextSpan(
+                      text: 'Mô tả ',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      children: [
+                    TextSpan(
+                        text: '*',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ))
+                  ])),
               const SizedBox(height: 8.0),
               TextFormField(
                 controller: controller.descController,
                 maxLines: 5,
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Nhập mô tả về sản phẩm',
                   border: OutlineInputBorder(),
@@ -187,17 +198,12 @@ class AddProductPage extends GetView<AddProductController> {
                 ),
               ),
               const SizedBox(height: 12.0),
-              Obx(
-                () => controller.categories.isNotEmpty
-                    ? ProductCategoryList(
-                        categories: controller.categories,
-                        productCategories: controller.chooseCategories,
-                        onChoose: (dataList) {
-                          controller.chooseCategories.value = dataList;
-                        },
-                      )
-                    : const Center(child: CircularProgressIndicator()),
-              ),
+              ProductCategoryList(
+                  productCategories: controller.chooseCategories,
+                  onChoose: (item) {
+                    controller.chooseCategories.add(item);
+                    log('Category list: ${controller.chooseCategories.length}');
+                  }),
               const SizedBox(height: 12.0),
               RichText(
                   text: const TextSpan(
@@ -219,6 +225,9 @@ class AddProductPage extends GetView<AddProductController> {
               const SizedBox(height: 8.0),
               TextFormField(
                 controller: controller.originController,
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
                 decoration: const InputDecoration(
                   hintText: 'Nhập xuất sứ',
                   border: OutlineInputBorder(),
@@ -228,13 +237,142 @@ class AddProductPage extends GetView<AddProductController> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12.0),
+              RichText(
+                  text: const TextSpan(
+                      text: 'Công dụng của sản phẩm ',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      children: [
+                    TextSpan(
+                        text: '*',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ))
+                  ])),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: controller.useController,
+                onFieldSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    controller.productUses.add(value);
+                  }
+                },
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
+                decoration: const InputDecoration(
+                  hintText: 'Nhập công dụng',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 8.0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Obx(() => controller.productUses.isNotEmpty
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: controller.productUses.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => ListTile(
+                            leading: Text(
+                              (index + 1).toString(),
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            title: Text(
+                              controller.productUses[index],
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ))
+                  : const SizedBox()),
+              const SizedBox(height: 12.0),
+              RichText(
+                  text: const TextSpan(
+                      text: 'Cách sử dụng của sản phẩm ',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      children: [
+                    TextSpan(
+                        text: '*',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ))
+                  ])),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: controller.howToUseController,
+                onFieldSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    controller.howToUseList.add(value);
+                  }
+                },
+                validator: (input) => input == null || input.isEmpty
+                    ? 'Trường dữ liệu này là bắt buộc'
+                    : null,
+                decoration: const InputDecoration(
+                  hintText: 'Nhập cách sử dụng',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 8.0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Obx(() => controller.howToUseList.isNotEmpty
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: controller.howToUseList.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => ListTile(
+                            leading: Text(
+                              (index + 1).toString(),
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            title: Text(
+                              controller.howToUseList[index],
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ))
+                  : const SizedBox()),
+              const SizedBox(height: 16.0),
             ],
           ),
         ),
       ),
       persistentFooterButtons: [
         MaterialButton(
-          onPressed: () {},
+          onPressed: () {
+            controller.onConfirmAddProduct();
+          },
           color: Colors.green,
           minWidth: Get.width,
           height: 48.0,

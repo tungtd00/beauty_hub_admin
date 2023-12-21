@@ -40,7 +40,7 @@ class _ItemOrderState extends State<ItemOrder> {
   }
 
   void getUserInfo() {
-    FirebaseService.getUserInfo(widget.order.userID, (info) {
+    FirebaseService.fetchUserInfo(widget.order.userID, (info) {
       setState(() {
         userInfo = info;
       });

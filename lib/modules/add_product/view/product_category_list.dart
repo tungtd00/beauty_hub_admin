@@ -1,17 +1,18 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../../../models/category.dart';
+import '../../../shared/services/firebase_service.dart';
 
 class ProductCategoryList extends StatefulWidget {
-  final List<Category> categories;
-  final List<Category>? productCategories;
-  final Function(List<Category>) onChoose;
+  final List<Category> productCategories;
+  final Function(Category) onChoose;
 
   const ProductCategoryList({
     super.key,
-    required this.categories,
     required this.onChoose,
-    this.productCategories,
+    required this.productCategories,
   });
 
   @override
@@ -19,13 +20,12 @@ class ProductCategoryList extends StatefulWidget {
 }
 
 class _ProductCategoryListState extends State<ProductCategoryList> {
-  List<Category> productCategoryList = [];
   List<Category> chooseCategoryList = [];
+  List<Category> categoryList = [];
 
   @override
   void initState() {
-    productCategoryList = widget.categories;
-    chooseCategoryList = widget.productCategories ?? [];
+    getCategoryList();
     super.initState();
   }
 
@@ -53,41 +53,55 @@ class _ProductCategoryListState extends State<ProductCategoryList> {
                   ))
             ])),
         const SizedBox(height: 8.0),
-        Wrap(
-          spacing: 4.0,
-          children: productCategoryList
-              .map((e) => InkWell(
-                    onTap: () {
-                      setState(() {
-                        chooseCategoryList.add(e);
-                        widget.onChoose(chooseCategoryList);
-                      });
-                    },
-                    child: chooseCategoryList.contains(e)
-                        ? Chip(
-                            backgroundColor: Colors.green,
+        categoryList.isNotEmpty
+            ? Wrap(
+                spacing: 4.0,
+                children: categoryList
+                    .map((e) => InkWell(
+                          onTap: () {
+                            log('Choose item');
+                            setState(() {
+                              chooseCategoryList.add(e);
+                            });
+                          },
+                          child: Chip(
+                            backgroundColor: chooseCategoryList
+                                    .where((item) => item.id == e.id)
+                                    .isNotEmpty
+                                ? Colors.green
+                                : Colors.white,
                             label: Text(
                               e.name,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: chooseCategoryList
+                                        .where((item) => item.id == e.id)
+                                        .isNotEmpty
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                             onDeleted: () {
+                              log('Deleted item');
                               setState(() {
                                 chooseCategoryList.remove(e);
                               });
                             },
                             deleteIconColor: Colors.white,
-                          )
-                        : Chip(
-                            label: Text(e.name),
-                            deleteIcon: const SizedBox(),
-                            onDeleted: () {},
                           ),
-                  ))
-              .toList(),
-        ),
+                        ))
+                    .toList(),
+              )
+            : const Center(child: CircularProgressIndicator()),
       ],
     );
+  }
+
+  void getCategoryList() {
+    chooseCategoryList = widget.productCategories;
+    FirebaseService.fetchCategories((dataList) {
+      setState(() {
+        categoryList = dataList;
+      });
+    });
   }
 }

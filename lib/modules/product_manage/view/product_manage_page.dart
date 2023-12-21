@@ -35,20 +35,20 @@ class ProductManagePage extends GetView<ProductManageController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Obx(
-            () => controller.productList.isNotEmpty
-                ? Expanded(
-                    child: ListView.separated(
-                      itemBuilder: ((context, index) => ItemProduct(
+            () => controller.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : controller.productList.isNotEmpty
+                    ? Expanded(
+                        child: ListView.separated(
+                        itemBuilder: ((context, index) => ItemProduct(
                             product: controller.productList[index],
                             onEdit: (product) {
                               controller.onEditProduct(product);
-                            },
-                          )),
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: controller.productList.length,
-                    ),
-                  )
-                : const Center(child: CircularProgressIndicator()),
+                            })),
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemCount: controller.productList.length,
+                      ))
+                    : const Center(child: Text('Danh sách sản phẩm trống')),
           ),
         ],
       ),
