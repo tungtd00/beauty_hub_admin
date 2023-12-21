@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:beauty_hub_admin/models/category.dart';
 import 'package:beauty_hub_admin/models/product.dart';
 import 'package:beauty_hub_admin/shared/constants/app_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,9 +11,10 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/brand.dart';
 import '../../models/order.dart';
 import '../../models/product_detail.dart';
-import '../../models/user_infor.dart';
+import '../../models/user_info.dart' as models;
 
 class FirebaseService {
   static final _auth = FirebaseAuth.instance;
@@ -120,12 +122,12 @@ class FirebaseService {
             jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
         Order order = Order.fromJson(data);
         orders.add(order);
-        onComplete(orders);
       }
+      onComplete(orders);
     });
   }
 
-  static void getProductById(
+  static void fetchProductInfoById(
       String id, Function(Product) onComplete, Function(String) onError) {
     _dbRef.child('Products').child(id).get().then((snapshot) {
       final data =
@@ -134,10 +136,61 @@ class FirebaseService {
       onComplete(product);
     }).onError((error, stackTrace) => onError(error.toString()));
   }
-  
-  static void getUserInfo(String id, Function(UserInfor) onComplete, Function(String) onError) {
-    _dbRef.child('Users').child(id).get().then((value) {
 
+  static void fetchProductDetailInfoById(
+      String id, Function(ProductDetail) onComplete, Function(String) onError) {
+    _dbRef.child('DetailProducts').child(id).get().then((snapshot) {
+      final data =
+      jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
+      ProductDetail detail = ProductDetail.fromJson(data);
+      onComplete(detail);
+    }).onError((error, stackTrace) => onError(error.toString()));
+  }
+
+  static void getUserInfo(String id, Function(models.UserInfo) onComplete,
+      Function(String) onError) {
+    _dbRef.child('Users').child(id).get().then((snapshot) {
+      final data =
+          jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
+      models.UserInfo userInfo = models.UserInfo.fromJson(data);
+      onComplete(userInfo);
+    }).onError((error, stackTrace) => onError(error.toString()));
+  }
+
+  static void confirmOrder(String id, Function(String) onError) {
+    _dbRef.child('Orders').child(id).update({"status": "SUCCESS"}).onError(
+        (error, stackTrace) => onError(error.toString()));
+  }
+
+  static void cancelOrder(String id, Function(String) onError) {
+    _dbRef.child('Orders').child(id).update({"status": "CANCEL"}).onError(
+        (error, stackTrace) => onError(error.toString()));
+  }
+
+  static Future<void> fetchCategories(
+      Function(List<Category>) onComplete) async {
+    List<Category> categories = [];
+    _dbRef.child('Categories').get().then((snapshot) {
+      for (DataSnapshot dataSnapshot in snapshot.children) {
+        final data =
+            jsonDecode(jsonEncode(dataSnapshot.value)) as Map<String, dynamic>;
+        Category order = Category.fromJson(data);
+        categories.add(order);
+      }
+      onComplete(categories);
     });
+  }
+
+  static Future<void> fetchBrandInfo(Function(Brand) onComplete) async {
+    final prefs = Get.find<SharedPreferences>();
+    final idBrand = prefs.getString(AppConstants.idUser);
+    if (idBrand != null) {
+      _dbRef.child('Brands').child(idBrand).get().then((snapshot) {
+        final data =
+            jsonDecode(jsonEncode(snapshot.value)) as Map<String, dynamic>;
+        Brand brand = Brand.fromJson(data);
+        onComplete(brand);
+      });
+    }
   }
 }
