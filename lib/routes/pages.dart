@@ -9,7 +9,7 @@ import 'package:beauty_hub_admin/modules/order_manage/view/order_manage_page.dar
 import 'package:beauty_hub_admin/modules/product_manage/binding/product_manage_binding.dart';
 import 'package:beauty_hub_admin/modules/product_manage/view/product_manage_page.dart';
 import 'package:beauty_hub_admin/modules/revenue_statistics/binding/revenue_statistics_binding.dart';
-import 'package:beauty_hub_admin/modules/revenue_statistics/view/revenue_statisitics_page.dart';
+import 'package:beauty_hub_admin/modules/revenue_statistics/view/revenue_statistics_page.dart';
 import 'package:beauty_hub_admin/modules/splash/binding/splash_binding.dart';
 import 'package:beauty_hub_admin/modules/splash/view/splash_page.dart';
 import 'package:beauty_hub_admin/routes/app_routes.dart';

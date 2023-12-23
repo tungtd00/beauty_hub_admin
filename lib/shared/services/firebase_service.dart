@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:beauty_hub_admin/models/category.dart';
+import 'package:beauty_hub_admin/models/detail_brand.dart';
 import 'package:beauty_hub_admin/models/product.dart';
 import 'package:beauty_hub_admin/shared/constants/app_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -185,6 +186,19 @@ class FirebaseService {
     });
   }
 
+  static void fetchBrandWithAccount(
+    Function(bool) onComplete,
+    Function(String) onError,
+  ) {
+    final prefs = Get.find<SharedPreferences>();
+    final idBrand = prefs.getString(AppConstants.idUser);
+    if (idBrand != null) {
+      _dbRef.child('Brands').child(idBrand).get().then((snapshot) {
+        onComplete(snapshot.exists);
+      }).onError((error, stackTrace) => onError(error.toString()));
+    }
+  }
+
   static Future<void> fetchBrandInfo(Function(Brand) onComplete) async {
     final prefs = Get.find<SharedPreferences>();
     final idBrand = prefs.getString(AppConstants.idUser);
@@ -195,6 +209,72 @@ class FirebaseService {
         Brand brand = Brand.fromJson(data);
         onComplete(brand);
       });
+    }
+  }
+
+  static void updateProduct(
+    String id,
+    Map<String, dynamic> data,
+    Function() onComplete,
+    Function(String) onError,
+  ) {
+    _dbRef.child('Products').child(id).update(data);
+  }
+
+  static void updateDetailProduct(
+    String id,
+    Map<String, dynamic> data,
+    Function() onComplete,
+    Function(String) onError,
+  ) {
+    _dbRef.child('DetailProducts').child(id).update(data);
+  }
+
+  static void createStore(
+    Brand brand,
+    Function() onComplete,
+    Function(String) onError,
+  ) {
+    final prefs = Get.find<SharedPreferences>();
+    final idBrand = prefs.getString(AppConstants.idUser);
+    if (idBrand != null) {
+      _dbRef
+          .child('Brands')
+          .child(idBrand)
+          .set(brand.toJson())
+          .then((value) => onComplete())
+          .onError((error, stackTrace) => onError(error.toString()));
+    }
+  }
+
+  static void writeDetailToStore(DetailBrand detailBrand) {
+    final prefs = Get.find<SharedPreferences>();
+    final idBrand = prefs.getString(AppConstants.idUser);
+    if (idBrand != null) {
+      _dbRef.child('DetailBrands').child(idBrand).set(detailBrand.toJson());
+    }
+  }
+
+  static void uploadLogoBrand(
+    File imageFile,
+    Function(String) onSuccess,
+    Function(String) onFailure,
+  ) {
+    EasyLoading.show(status: 'Đang upload hình ảnh cửa hàng');
+    final prefs = Get.find<SharedPreferences>();
+    final idBrand = prefs.getString(AppConstants.idUser);
+    if (idBrand != null) {
+      _storeRef
+          .child('brands')
+          .child(idBrand)
+          .putFile(imageFile)
+          .then((taskSnapshot) async {
+        String imageUrl = await taskSnapshot.ref.getDownloadURL();
+        if (imageUrl.isNotEmpty) {
+          EasyLoading.dismiss();
+          onSuccess(imageUrl);
+        }
+      }).onError((error, stackTrace) => onFailure(error.toString()));
     }
   }
 }

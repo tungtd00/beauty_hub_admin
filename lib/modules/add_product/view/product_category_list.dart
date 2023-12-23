@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:beauty_hub_admin/modules/add_product/controller/add_product_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../models/category.dart';
 import '../../../shared/services/firebase_service.dart';
@@ -22,6 +24,8 @@ class ProductCategoryList extends StatefulWidget {
 class _ProductCategoryListState extends State<ProductCategoryList> {
   List<Category> chooseCategoryList = [];
   List<Category> categoryList = [];
+
+  final controller = Get.find<AddProductController>();
 
   @override
   void initState() {
@@ -61,7 +65,8 @@ class _ProductCategoryListState extends State<ProductCategoryList> {
                           onTap: () {
                             log('Choose item');
                             setState(() {
-                              chooseCategoryList.add(e);
+                            //  chooseCategoryList.add(e);
+                              controller.chooseCategories.add(e);
                             });
                           },
                           child: Chip(
@@ -83,7 +88,8 @@ class _ProductCategoryListState extends State<ProductCategoryList> {
                             onDeleted: () {
                               log('Deleted item');
                               setState(() {
-                                chooseCategoryList.remove(e);
+                                //chooseCategoryList.remove(e);
+                                controller.chooseCategories.remove(e);
                               });
                             },
                             deleteIconColor: Colors.white,
