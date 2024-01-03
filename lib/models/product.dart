@@ -1,7 +1,7 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'brand.dart';
 import 'category.dart';
+import 'package:json_annotation/json_annotation.dart';
+
 
 part 'product.g.dart';
 

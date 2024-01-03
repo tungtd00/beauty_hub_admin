@@ -1,6 +1,6 @@
-import 'package:beauty_hub_admin/modules/auth/controller/auth_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:beauty_hub_admin/modules/auth/controller/auth_controller.dart';
 
 class AuthPage extends GetView<AuthController> {
   const AuthPage({super.key});
@@ -65,8 +65,8 @@ class AuthPage extends GetView<AuthController> {
                 ),
                 const SizedBox(height: 24.0),
                 MaterialButton(
-                    onPressed: () {
-                      controller.onLogin();
+                    onPressed: () async {
+                     await controller.onLogin();
                     },
                     color: Colors.green,
                     elevation: 0.0,

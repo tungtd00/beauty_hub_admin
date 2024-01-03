@@ -1,10 +1,11 @@
-import 'package:beauty_hub_admin/routes/app_routes.dart';
-import 'package:beauty_hub_admin/shared/constants/app_constants.dart';
-import 'package:beauty_hub_admin/shared/services/firebase_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:beauty_hub_admin/models/user_admin.dart';
+import 'package:beauty_hub_admin/routes/app_routes.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:beauty_hub_admin/shared/constants/app_constants.dart';
 
 class AuthController extends GetxController {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
@@ -13,19 +14,46 @@ class AuthController extends GetxController {
   TextEditingController passwordController = TextEditingController();
 
   static final _prefs = Get.find<SharedPreferences>();
-
+  static final _dbRef = _database.refFromURL(AppConstants.dbUrl);
+  static final _database = FirebaseDatabase.instance;
   Future<void> onLogin() async {
     if (globalKey.currentState!.validate()) {
-      final userCredential = await FirebaseService.loginWithEmailPassword(
-          emailController.text,
-          passwordController.text,
-          (error) => EasyLoading.showError(error));
-      if (userCredential != null) {
-        if (userCredential.user != null) {
-          _prefs.setString(AppConstants.idUser, userCredential.user!.uid);
-          Get.offAllNamed(AppRoutes.homePage);
+      UserAdmin? userAdmin;
+      _dbRef.child('UserAdmin').get().then((snapshot) {
+        for (DataSnapshot dataSnapshot in snapshot.children) {
+          final data = jsonDecode(jsonEncode(dataSnapshot.value))
+              as Map<String, dynamic>;
+          UserAdmin userAdminTest = UserAdmin.fromJson(data);
+          if (userAdminTest.email == emailController.text &&
+              userAdminTest.password == passwordController.text) {
+            userAdmin = userAdminTest;
+          }
         }
-      }
+        print("object : $userAdmin");
+        if (userAdmin != null) {
+          if (userAdmin?.idAccount != null) {
+            _prefs.setString(AppConstants.idUser, userAdmin?.idAccount ?? "");
+            Get.offAllNamed(AppRoutes.homePage,arguments:userAdmin );
+          }
+        }
+      });
     }
+  }
+
+   Future<UserAdmin?> getUser(String id) async {
+      UserAdmin? userAdmin;
+     await _dbRef.child('UserAdmin').get().then((snapshot) {
+        for (DataSnapshot dataSnapshot in snapshot.children) {
+          final data = jsonDecode(jsonEncode(dataSnapshot.value))
+              as Map<String, dynamic>;
+          UserAdmin userAdminTest = UserAdmin.fromJson(data);
+          if (userAdminTest.idAccount == id) {
+            return userAdminTest;
+          }
+        }
+        return null;
+       
+      });
+    
   }
 }

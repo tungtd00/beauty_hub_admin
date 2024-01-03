@@ -1,22 +1,22 @@
-import 'dart:developer';
 import 'dart:io';
-
+import 'dart:developer';
+import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
+import 'package:flutter/material.dart';
+import '../../../models/category.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:beauty_hub_admin/models/brand.dart';
 import 'package:beauty_hub_admin/models/product.dart';
 import 'package:beauty_hub_admin/models/product_detail.dart';
-import 'package:beauty_hub_admin/modules/product_manage/controller/product_manage_controller.dart';
-import 'package:beauty_hub_admin/shared/services/firebase_service.dart';
 import 'package:beauty_hub_admin/shared/utils/app_utils.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
+import 'package:beauty_hub_admin/shared/services/firebase_service.dart';
+import 'package:beauty_hub_admin/modules/product_manage/controller/product_manage_controller.dart';
 
-import '../../../models/category.dart';
+
 
 class AddProductController extends GetxController {
   final product = Get.arguments as Product?;
-
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController descController = TextEditingController();
@@ -33,7 +33,11 @@ class AddProductController extends GetxController {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
 
   final productManageController = Get.find<ProductManageController>();
+   Brand brand = Brand(
+    "A9DVvInX9dcGFoTicW1TYYDJyCt1", "Phúc Mỹ Phẩm", 
+    "https://firebasestorage.googleapis.com/v0/b/selling-food-store.appspot.com/o/brands%2FA9DVvInX9dcGFoTicW1TYYDJyCt1?alt=media&token=f8d8a1ad-fea5-4e9d-a447-305712e7d1b1");
 
+  //Auth
   @override
   void onInit() {
     if (product == null) {
@@ -84,7 +88,63 @@ class AddProductController extends GetxController {
           EasyLoading.showError('Chưa có hướng dẫn sử dụng sản phẩm');
         } else {
           EasyLoading.show(status: 'Đang upload hình ảnh');
-          FirebaseService.fetchBrandInfo((branInfo) {
+        
+            String idProduct = const Uuid().v4();
+            double price = double.tryParse(priceController.text) ?? 0;
+            FirebaseService.uploadImageProduct(idProduct, imageFile.value!,
+                (image) {
+              EasyLoading.dismiss();
+              Product product = Product(
+                  idProduct,
+                  nameController.text,
+                  image,
+                  descController.text,
+                  price,
+                  10000,
+                  brand,
+                  chooseCategories,
+                  10000);
+              FirebaseService.writeProductToDb(product);
+              ProductDetail productDetail = ProductDetail(
+                  idProduct,
+                  nameController.text,
+                  image,
+                  descController.text,
+                  price,
+                  10000,
+                  introController.text,
+                  ["san pham tot"],
+                  productUses,
+                  howToUseList,
+                  originController.text,
+                  ["use"],
+                  brand,
+                  chooseCategories,
+                 165456);
+              
+              FirebaseService.writeDetailProductToDb(productDetail);
+              productManageController.productList.add(product);
+              EasyLoading.showSuccess('Đăng sản phẩm thành công');
+            }, (error) {
+              log('Error: $error');
+              EasyLoading.showError('Đã có lỗi xảy ra');
+            });
+          
+        }
+      }
+    }
+    else{
+
+       if (globalKey.currentState!.validate()) {
+        if (imageFile.value == null) {
+          EasyLoading.showError('Ảnh sản phẩm là bắt buộc');
+        } else if (productUses.isEmpty) {
+          EasyLoading.showError('Công dụng sản phẩm là bắt buộc');
+        } else if (howToUseList.isEmpty) {
+          EasyLoading.showError('Chưa có hướng dẫn sử dụng sản phẩm');
+        } else {
+          EasyLoading.show(status: 'Đang upload hình ảnh');
+        
             String idProduct = const Uuid().v4();
             double price = double.tryParse(priceController.text) ?? 0;
             FirebaseService.uploadImageProduct(idProduct, imageFile.value!,
@@ -97,7 +157,7 @@ class AddProductController extends GetxController {
                   descController.text,
                   price,
                   null,
-                  branInfo,
+                  brand,
                   chooseCategories,
                   null);
               FirebaseService.writeProductToDb(product);
@@ -114,19 +174,25 @@ class AddProductController extends GetxController {
                   howToUseList,
                   originController.text,
                   null,
-                  branInfo,
+                  brand,
                   chooseCategories,
                   null);
-              FirebaseService.writeDetailProductToDb(productDetail);
+              
+              FirebaseService.updateProduct(productDetail.idProduct,productDetail.toJson(),() {
+                
+              },(r) {
+                
+              },);
               productManageController.productList.add(product);
               EasyLoading.showSuccess('Đăng sản phẩm thành công');
             }, (error) {
               log('Error: $error');
               EasyLoading.showError('Đã có lỗi xảy ra');
             });
-          });
+          
         }
       }
+
     }
   }
 }

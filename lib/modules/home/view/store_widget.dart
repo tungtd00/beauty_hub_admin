@@ -1,21 +1,24 @@
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter/material.dart';
 import '../../../routes/app_routes.dart';
 import '../../../shared/services/firebase_service.dart';
+import 'package:beauty_hub_admin/models/user_admin.dart';
+
+
 
 class StoreWidget extends StatefulWidget {
   final bool? isExists;
   final Function() onCreate;
   final Function() onLogOut;
+  final UserAdmin userAdmin;
 
   const StoreWidget({
     super.key,
     required this.onLogOut,
     required this.onCreate,
     this.isExists,
+    required this.userAdmin
   });
 
   @override
@@ -51,9 +54,19 @@ class _StoreWidgetState extends State<StoreWidget> {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : isStoreExists
-                ? Column(children: [
+            ? const Center(child: CircularProgressIndicator()):
+             Column(
+
+              children: [
+                Visibility(
+                  visible: widget.userAdmin.role == "1",
+                  child:ListTile(
+                      leading: const Icon(Icons.article_outlined),
+                      title: const Text('Quản lý nhân viên'),
+                      onTap: () {
+                        Get.toNamed(AppRoutes.staffManage);
+                      },
+                    ),),
                     ListTile(
                       leading: const Icon(Icons.article_outlined),
                       title: const Text('Quản lý sản phẩm'),
@@ -97,40 +110,8 @@ class _StoreWidgetState extends State<StoreWidget> {
                       ),
                     ),
                     const SizedBox(height: 32.0),
-                  ])
-                : Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.add_business,
-                          color: Colors.green,
-                          size: 48.0,
-                        ),
-                        const SizedBox(height: 8.0),
-                        MaterialButton(
-                          onPressed: () {
-                            widget.onCreate();
-                          },
-                          elevation: 0.0,
-                          color: Colors.green,
-                          disabledElevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: const Text(
-                            'Tạo cửa hàng',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ));
+                  ]));
+              
   }
 
   void checkStoreWithAccountExists() {

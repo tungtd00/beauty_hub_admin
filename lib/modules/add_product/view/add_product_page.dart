@@ -1,9 +1,9 @@
 import 'dart:developer';
-
-import 'package:beauty_hub_admin/modules/add_product/controller/add_product_controller.dart';
-import 'package:beauty_hub_admin/modules/add_product/view/product_category_list.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:beauty_hub_admin/modules/add_product/view/product_category_list.dart';
+import 'package:beauty_hub_admin/modules/add_product/controller/add_product_controller.dart';
+
 
 class AddProductPage extends GetView<AddProductController> {
   const AddProductPage({super.key});
