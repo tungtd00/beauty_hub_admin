@@ -100,10 +100,10 @@ class AddProductController extends GetxController {
                   image,
                   descController.text,
                   price,
-                  1000,
+                  0.0,
                   brand,
                   chooseCategories,
-                  1000);
+                  0.0);
               FirebaseService.writeProductToDb(product);
               ProductDetail productDetail = ProductDetail(
                   idProduct,
@@ -111,7 +111,7 @@ class AddProductController extends GetxController {
                   image,
                   descController.text,
                   price,
-                  1000,
+                  0.0,
                   introController.text,
                   ["san pham tot"],
                   productUses,
@@ -120,7 +120,7 @@ class AddProductController extends GetxController {
                   ["use"],
                   brand,
                   chooseCategories,
-                 1000);
+                 0.0);
               
               FirebaseService.writeDetailProductToDb(productDetail);
               productManageController.productList.add(product);
@@ -146,8 +146,7 @@ class AddProductController extends GetxController {
           EasyLoading.show(status: 'Đang upload hình ảnh');
         
             String idProduct = const Uuid().v4();
-            double price = double.tryParse(priceController.text) ?? 0;
-          
+            double price = double.tryParse(priceController.text) ?? 0;      
               EasyLoading.dismiss();
               Product product = Product(
                   idProduct,
@@ -155,10 +154,10 @@ class AddProductController extends GetxController {
                   productController!.image,
                   descController.text,
                   price,
-                  1000,
+                  0.0,
                   brand,
                   chooseCategories,
-                  10000);
+                  0.0);
               FirebaseService.writeProductToDb(product);
               ProductDetail productDetail = ProductDetail(
                   idProduct,
@@ -166,7 +165,7 @@ class AddProductController extends GetxController {
                   productController!.image,
                   descController.text,
                   price,
-                  10000,
+                  0.0,
                   introController.text,
                   ["san pham tot"],
                   productUses,
@@ -175,7 +174,7 @@ class AddProductController extends GetxController {
                   ["san pham tot"],
                   brand,
                   chooseCategories,
-                  100);
+                  0.0);
               
               FirebaseService.updateProduct(product.idProduct,product.convertToJson(),() {
                 
