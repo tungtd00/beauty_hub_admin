@@ -49,8 +49,6 @@ class Product {
   }
 
   double getPrice() {
-    return discount != null && discount != 0.0
-        ? cost - cost * (discount! / 100.0)
-        : cost;
+    return cost;
   }
 }

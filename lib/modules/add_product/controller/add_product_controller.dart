@@ -16,7 +16,7 @@ import 'package:beauty_hub_admin/modules/product_manage/controller/product_manag
 
 
 class AddProductController extends GetxController {
-  final product = Get.arguments as Product?;
+  final productController = Get.arguments as Product?;
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController descController = TextEditingController();
@@ -40,7 +40,7 @@ class AddProductController extends GetxController {
   //Auth
   @override
   void onInit() {
-    if (product == null) {
+    if (productController == null) {
       title.value = 'Thêm sản phẩm mới';
     } else {
       title.value = 'Chỉnh sửa sản phẩm';
@@ -50,11 +50,11 @@ class AddProductController extends GetxController {
   }
 
   void _fillProductData() {
-    nameController.text = product!.name;
-    priceController.text = AppUtils.formatPrice(product!.cost);
-    descController.text = product!.description;
-    chooseCategories.addAll(product!.categories);
-    FirebaseService.fetchProductDetailInfoById(product!.idProduct, (detail) {
+    nameController.text = productController!.name;
+    priceController.text = AppUtils.formatPrice(productController!.cost);
+    descController.text = productController!.description;
+    chooseCategories.addAll(productController!.categories);
+    FirebaseService.fetchProductDetailInfoById(productController!.idProduct, (detail) {
       if (detail.introduce != null) {
         introController.text = detail.introduce!;
       }
@@ -78,7 +78,7 @@ class AddProductController extends GetxController {
   }
 
   void onConfirmAddProduct() {
-    if (product == null) {
+    if (productController == null) {
       if (globalKey.currentState!.validate()) {
         if (imageFile.value == null) {
           EasyLoading.showError('Ảnh sản phẩm là bắt buộc');
@@ -100,10 +100,10 @@ class AddProductController extends GetxController {
                   image,
                   descController.text,
                   price,
-                  10000,
+                  1000,
                   brand,
                   chooseCategories,
-                  10000);
+                  1000);
               FirebaseService.writeProductToDb(product);
               ProductDetail productDetail = ProductDetail(
                   idProduct,
@@ -111,7 +111,7 @@ class AddProductController extends GetxController {
                   image,
                   descController.text,
                   price,
-                  10000,
+                  1000,
                   introController.text,
                   ["san pham tot"],
                   productUses,
@@ -120,7 +120,7 @@ class AddProductController extends GetxController {
                   ["use"],
                   brand,
                   chooseCategories,
-                 165456);
+                 1000);
               
               FirebaseService.writeDetailProductToDb(productDetail);
               productManageController.productList.add(product);
@@ -147,48 +147,49 @@ class AddProductController extends GetxController {
         
             String idProduct = const Uuid().v4();
             double price = double.tryParse(priceController.text) ?? 0;
-            FirebaseService.uploadImageProduct(idProduct, imageFile.value!,
-                (image) {
+          
               EasyLoading.dismiss();
               Product product = Product(
                   idProduct,
                   nameController.text,
-                  image,
+                  productController!.image,
                   descController.text,
                   price,
-                  null,
+                  1000,
                   brand,
                   chooseCategories,
-                  null);
+                  10000);
               FirebaseService.writeProductToDb(product);
               ProductDetail productDetail = ProductDetail(
                   idProduct,
                   nameController.text,
-                  image,
+                  productController!.image,
                   descController.text,
                   price,
-                  null,
+                  10000,
                   introController.text,
-                  null,
+                  ["san pham tot"],
                   productUses,
                   howToUseList,
                   originController.text,
-                  null,
+                  ["san pham tot"],
                   brand,
                   chooseCategories,
-                  null);
+                  100);
               
-              FirebaseService.updateProduct(productDetail.idProduct,productDetail.toJson(),() {
+              FirebaseService.updateProduct(product.idProduct,product.convertToJson(),() {
+                
+              },(r) {
+                
+              },);
+              FirebaseService.updateDetailProduct(productDetail.idProduct,productDetail.convertToJson(),() {
                 
               },(r) {
                 
               },);
               productManageController.productList.add(product);
               EasyLoading.showSuccess('Đăng sản phẩm thành công');
-            }, (error) {
-              log('Error: $error');
-              EasyLoading.showError('Đã có lỗi xảy ra');
-            });
+          
           
         }
       }
